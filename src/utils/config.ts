@@ -130,7 +130,7 @@ export const compareConfiguration = (updated: any, current: any, commands: any) 
   keys.forEach((key) => {
     if (!commands.length || commands.includes(key)) {
       Logger.logInfo(`checking settings for operation - ${chalk.greenBright(key)}`)
-      let subKeys = Object.keys(updated.message[key]);
+      const subKeys = Object.keys(updated.message[key]);
       subKeys.forEach((subKey) => {
         if (!defaultMetaKeys.includes(subKey)) {
           if (current.message[key].hasOwnProperty(subKey) && updated.message[key].hasOwnProperty(subKey) && 
@@ -152,7 +152,7 @@ export const compareConfiguration = (updated: any, current: any, commands: any) 
   keys.forEach((key) => {
     if (!commands.length || commands.includes(key)) {
       Logger.logInfo(`checking settings for operation - ${chalk.greenBright(key)}`)
-      let subKeys = Object.keys(updated.manage[key]);
+      const subKeys = Object.keys(updated.manage[key]);
       subKeys.forEach((subKey) => {
         if (!defaultMetaKeys.includes(subKey)) {
           if (current.manage[key].hasOwnProperty(subKey) && updated.manage[key].hasOwnProperty(subKey) && 
@@ -235,14 +235,14 @@ export const saveConfig = (data: any) => {
     const configFile = data.config;
     delete data.config;
 
-    var updated = false;
+    let updated = false;
     const filePath = processPath(`${defaultStmHome}/${configFile}`)
       if (!filePath.endsWith('.json')) filePath.concat('.json')
     if (fileExists(filePath)) {
       const config:any = readFile(filePath)
       if (data.message.connection && compareConfiguration(data, config, []) > 0) {
-        var prompt = require('prompt-sync')();
-        var confirmation = prompt(`${chalk.whiteBright('Changes detected in the settings, do you want to overwrite (') + 
+        const prompt = require('prompt-sync')();
+        const confirmation = prompt(`${chalk.whiteBright('Changes detected in the settings, do you want to overwrite (') + 
                                     chalk.greenBright('y') + chalk.whiteBright('/') + 
                                     chalk.redBright('n') + chalk.whiteBright('): ')}`);
         if (!['Y', 'YES'].includes(confirmation.toUpperCase())) {
@@ -295,10 +295,10 @@ export const loadConfig = (configFile: string) => {
 export const createDefaultConfig = () => {
 
   // set the config to default config filename
-  var options:any = {}
+  const options:any = {}
   options.config = defaultConfigFile
 
-  var optionsSource:any = {};
+  const optionsSource:any = {};
   const defaultMessageKeys = Object.keys(defaultMessageConnectionConfig);
   for (var i=0; i<defaultMessageKeys.length; i++) {
     optionsSource[defaultMessageKeys[i]] = 'default'
@@ -315,7 +315,7 @@ export const createDefaultConfig = () => {
 
 export const loadCommandFromConfig = (cmd: string, options: MessageClientOptions | ManageClientOptions | ManageFeedPublishOptions) => {
   try {
-    var group = getCommandGroup(cmd)
+    const group = getCommandGroup(cmd)
     if (!options.config) {
       Logger.aid(`Hoho! No default configuration found, creating one for you...`)
       createDefaultConfig()
@@ -325,10 +325,10 @@ export const loadCommandFromConfig = (cmd: string, options: MessageClientOptions
       return readFile(defaultConfigFile)
     }
     
-    var commandName = options.name ? options.name : cmd
+    const commandName = options.name ? options.name : cmd
     const filePath = processPath(`${defaultStmHome}/${options.config as string}`)
     const localFilePath = processPath(`${options.config as string}`)
-    var config = null;
+    let config = null;
     if (fileExists(filePath)) {
       config = readFile(filePath)
       Logger.info(`loading '${commandName}' command from configuration '${chalk.cyanBright(filePath)}'`)
@@ -434,15 +434,15 @@ export const saveOrUpdateCommandSettings = (options: MessageClientOptions | Mana
   }
 
   try {
-    var newConfigCreated = false;
-    var group = getCommandGroup(options.command)
+    let newConfigCreated = false;
+    const group = getCommandGroup(options.command)
     if (!group) {
       Logger.logDetailedError(`unknown '${options.command}' command`, `specify a valid command name`)
       Logger.logError('exiting...')
       process.exit(1)
     }
 
-    var commandName = options.name ? options.name : options.command
+    let commandName = options.name ? options.name : options.command
     if (!commandName) {
       Logger.logDetailedError(`unknown '${commandName}' command name`, `missing or invalid valid command name`)
       Logger.logError('exiting...')
@@ -459,10 +459,10 @@ export const saveOrUpdateCommandSettings = (options: MessageClientOptions | Mana
     }
 
     // load current configuration
-    var current:any = loadConfig(options.config)
+    const current:any = loadConfig(options.config)
 
     // build configuration from the command line parameters
-    var updated = buildMessageConfig(current, options, optionsSource, [ group === 'manage' ? 'sempconnection' : 'connection', options.command]);
+    const updated = buildMessageConfig(current, options, optionsSource, [ group === 'manage' ? 'sempconnection' : 'connection', options.command]);
 
     // absorb unchanged params from the current -> updated
     Object.keys(optionsSource).forEach(key => {
@@ -487,7 +487,7 @@ export const saveOrUpdateCommandSettings = (options: MessageClientOptions | Mana
       }
     }
 
-    var newOrUpdate = (options.save && typeof options.save === 'string' && current[group][options.save] === undefined) ? 'new' : 'update'
+    const newOrUpdate = (options.save && typeof options.save === 'string' && current[group][options.save] === undefined) ? 'new' : 'update'
     if (newOrUpdate === 'new') {
       if (group === 'message') {
         current.message.connection = updated.message.connection;
@@ -521,10 +521,10 @@ export const saveOrUpdateCommandSettings = (options: MessageClientOptions | Mana
         }
 
         // compare and save
-        var count = compareConfiguration(updated, current, [ group === 'manage' ? 'sempconnection' : 'connection', commandName ]);
+        const count = compareConfiguration(updated, current, [ group === 'manage' ? 'sempconnection' : 'connection', commandName ]);
         if (count > 0) {
-          var prompt = require('prompt-sync')();
-          var confirmation = prompt(`${chalk.whiteBright('Changes detected in the settings, do you want to overwrite (') + 
+          const prompt = require('prompt-sync')();
+          const confirmation = prompt(`${chalk.whiteBright('Changes detected in the settings, do you want to overwrite (') + 
                                       chalk.greenBright('y') + chalk.whiteBright('/') + 
                                       chalk.redBright('n') + chalk.whiteBright('): ')}`);
           if (!['Y', 'YES'].includes(confirmation.toUpperCase())) {
@@ -581,8 +581,8 @@ export const createFeed = (fileName: string, feedName: string, feedJson: object,
         Logger.warn(`Feed '${feedName}' already exists, overwriting...`)
       } else {
         Logger.warn(`Feed '${feedName}' already exists, `)
-        var prompt = require('prompt-sync')();
-        var confirmation = prompt(`${chalk.whiteBright('Feed already exists, do you want to overwrite (') + 
+        const prompt = require('prompt-sync')();
+        const confirmation = prompt(`${chalk.whiteBright('Feed already exists, do you want to overwrite (') + 
                                     chalk.greenBright('y') + chalk.whiteBright('/') + 
                                     chalk.redBright('n') + chalk.whiteBright('): ')}`);
         if (!['Y', 'YES'].includes(confirmation.toUpperCase())) {
@@ -646,7 +646,7 @@ export const validateFeed = (feedName: string, type: string) => {
 export const loadLoadFeedInfo = (feedName: any) => {
   const feedPath = processPlainPath(`${defaultStmFeedsHome}/${feedName}`);
   try {
-    var info = readFile(`${feedPath}/${defaultFeedInfoFile}`);
+    const info = readFile(`${feedPath}/${defaultFeedInfoFile}`);
     return info;
   } catch (error: any) {
     Logger.logDetailedError('load feed info failed', error.toString())
@@ -661,7 +661,7 @@ export const updateAndLoadFeedInfo = (feed: any) => {
   try {
     writeJsonFile(`${feedPath}/${defaultFeedInfoFile}`, feed, true);
 
-    var info = readFile(`${feedPath}/${defaultFeedInfoFile}`);
+    const info = readFile(`${feedPath}/${defaultFeedInfoFile}`);
     return info;
   } catch (error: any) {
     Logger.logDetailedError('load feed info failed', error.toString())
@@ -678,7 +678,7 @@ export const loadLocalFeedSessionSettingsFile =(feedName: string, fileName: stri
       return false;
     }
 
-    var session = readFile(`${feedPath}/${fileName}`);
+    const session = readFile(`${feedPath}/${fileName}`);
     return session;
   } catch (error: any) {
     Logger.logDetailedError(`failed to fetch ${fileName}, check whether the feed exists!`, error.toString())
@@ -696,7 +696,7 @@ export const loadLocalFeedSessionFile = (feedName: string, fileName: string) => 
       throw new TypeError(`Feed session file not found!`);
     }
 
-    var analysis = readFile(`${feedPath}/${fileName}`);
+    const analysis = readFile(`${feedPath}/${fileName}`);
     return analysis;
   } catch (error: any) {
     throw new TypeError(`Feed session file not found!`);
@@ -712,7 +712,7 @@ export const loadLocalFeedFile = (feedName: string, fileName: string) => {
       process.exit(1);
     }
 
-    var analysis = readFile(`${feedPath}/${fileName}`);
+    const analysis = readFile(`${feedPath}/${fileName}`);
     return analysis;
   } catch (error: any) {
     Logger.logDetailedError(`failed to fetch ${fileName}, check whether the feed exists!`, error.toString())
@@ -731,7 +731,7 @@ export const loadRawLocalFeedFile = (feedName: string, fileName: string) => {
       process.exit(1);
     }
 
-    var analysis = readRawFile(`${feedPath}/${fileName}`);
+    const analysis = readRawFile(`${feedPath}/${fileName}`);
     return analysis;
   } catch (error: any) {
     Logger.logDetailedError(`failed to fetch ${fileName}, check whether the feed exists!`, error.toString())
@@ -752,7 +752,7 @@ export const loadLocalApiFeedRuleFile = (feedName: string, fileName: string) => 
     if (!fileExists(`${feedPath}/${fileName}`))
       return false;
 
-    var feedRules = readFile(`${feedPath}/${fileName}`);
+    const feedRules = readFile(`${feedPath}/${fileName}`);
     return feedRules;
   } catch (error: any) {
     Logger.logDetailedError(`failed to fetch ${fileName}, check whether the feed exists!`, error.toString())
@@ -768,7 +768,7 @@ export const getAllFeeds = () => {
   const feeds: any[] = [];
   
   directories.forEach((feedName: string) => {
-    var stat = fs.lstatSync(`${feedPath}/${feedName}`);
+    const stat = fs.lstatSync(`${feedPath}/${feedName}`);
     if (stat.isDirectory() && fs.existsSync(`${feedPath}/${feedName}/${defaultFeedInfoFile}`)) {
       const info:any = loadLocalFeedFile(feedName, defaultFeedInfoFile) ;
       feeds.push({
@@ -793,10 +793,10 @@ export const getFeed = (feedName: string, info: any = null) => {
   if (!info) info = loadLocalFeedFile(feedName, defaultFeedInfoFile) ;
 
   files.forEach((fileName: string) => {
-    var filePath = `${configPath}/${fileName}`
-    var stat = fs.lstatSync(filePath);
+    const filePath = `${configPath}/${fileName}`
+    const stat = fs.lstatSync(filePath);
     if (!stat.isDirectory() && fileName.endsWith('.json')) {
-      var broker = readFile(`${configPath}/${fileName}`);
+      const broker = readFile(`${configPath}/${fileName}`);
       if (broker?.message?.connection)
         brokers.push({broker: fileName, config: broker?.message?.connection});
     }
@@ -846,7 +846,7 @@ export const updateSession = async (feedName: string, sessionJson: any) => {
 
     writeFile(`${sessionFile}`, sessionJson)
 
-    var info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
+    const info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
     info.lastUpdated = new Date().toISOString();
     writeJsonFile(`${feedPath}/${defaultFeedInfoFile}`, info, true);
     return true;
@@ -868,7 +868,7 @@ export const updateRules = async (feedName: string, rulesJson: any) => {
 
     writeFile(`${rulesFile}`, rulesJson)
 
-    var info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
+    const info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
     info.lastUpdated = new Date().toISOString();
     writeJsonFile(`${feedPath}/${defaultFeedInfoFile}`, info, true);
     return true;
@@ -890,7 +890,7 @@ export const updateApiRules = async (feedName: string, rulesJson: any) => {
 
     writeFile(`${rulesFile}`, rulesJson)
 
-    var info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
+    const info = loadLocalFeedFile(feedName, defaultFeedInfoFile);
     info.lastUpdated = new Date().toISOString();
     writeJsonFile(`${feedPath}/${defaultFeedInfoFile}`, info, true);
     return true;
@@ -933,7 +933,7 @@ export const urlExists = async (url:any) => {
 
 export const validURL = (url:any) => {
 	try {
-		return new URL(url.trim()) // eslint-disable-line no-new
+		return new URL(url.trim())  
 	} catch (_e) {
 		return null
 	}
@@ -941,8 +941,8 @@ export const validURL = (url:any) => {
 
 export const loadGitFeedSessionFile = async (feedName: string, fileName: string) => {
   try {
-    var feedUrl = `${defaultGitRepo}/${feedName}`;
-    var validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
+    const feedUrl = `${defaultGitRepo}/${feedName}`;
+    const validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
     if (!validFeedUrl) {
       throw new TypeError(`Feed session file not found!`);
     }
@@ -962,8 +962,8 @@ export const loadGitFeedSessionFile = async (feedName: string, fileName: string)
 
 export const loadGitFeedFile = async (feedName: string, fileName: string) => {
   try {
-    var feedUrl = `${defaultGitRepo}/${feedName}`;
-    var validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
+    const feedUrl = `${defaultGitRepo}/${feedName}`;
+    const validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
     if (!validFeedUrl) {
       Logger.logDetailedError('invalid or non-existing feed URL', feedUrl)
       Logger.logError('exiting...')
@@ -990,8 +990,8 @@ export const loadGitFeedFile = async (feedName: string, fileName: string) => {
 
 export const loadRawGitFeedFile = async (feedName: string, fileName: string) => {
   try {
-    var feedUrl = `${defaultGitRepo}/${feedName}`;
-    var validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
+    const feedUrl = `${defaultGitRepo}/${feedName}`;
+    const validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
     if (!validFeedUrl) {
       Logger.logDetailedError('invalid or non-existing feed URL', feedUrl)
       Logger.logError('exiting...')
@@ -1017,8 +1017,8 @@ export const loadRawGitFeedFile = async (feedName: string, fileName: string) => 
 
 export const loadGitApiFeedRuleFile = async (feedName: string, fileName: string) => {
   try {
-    var feedUrl = `${defaultGitRepo}/${feedName}`;
-    var validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
+    const feedUrl = `${defaultGitRepo}/${feedName}`;
+    const validFeedUrl = await urlExists(encodeURI(`${feedUrl}/${fileName}`));
     if (!validFeedUrl) {
       Logger.logDetailedError('invalid or non-existing feed URL', feedUrl)
       Logger.logError('exiting...')
@@ -1047,8 +1047,8 @@ export const createApiFeed = (feed: any) => {
   try {
     if (fileExists(feedPath)) {
       Logger.warn(`Feed '${feed.name}' already exists, `)
-      var prompt = require('prompt-sync')();
-      var confirmation = prompt(`${chalk.whiteBright('Feed already exists, do you want to overwrite (') + 
+      const prompt = require('prompt-sync')();
+      const confirmation = prompt(`${chalk.whiteBright('Feed already exists, do you want to overwrite (') + 
                                   chalk.greenBright('y') + chalk.whiteBright('/') + 
                                   chalk.redBright('n') + chalk.whiteBright('): ')}`);
       if (!['Y', 'YES'].includes(confirmation.toUpperCase())) {
